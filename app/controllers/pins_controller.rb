@@ -12,14 +12,16 @@ class PinsController < ApplicationController
   end
 
   def new
-    @pin = current_user.pins.build
+    @pin = Pin.new
+    @pin.user_id = current_user.id
   end
 
   def edit
   end
 
   def create
-    @pin = current_user.pins.build(pin_params)
+    @pin = Pin.new(pin_params)
+    @pin.user_id = current_user.id
     if @pin.save
       redirect_to @pin, notice: 'Pin was successfully created.'
     else
@@ -37,17 +39,18 @@ class PinsController < ApplicationController
 
   def destroy
     @pin.destroy
-    redirect_to pins_url, notice: 'Pin was successfully deleted.'
+    redirect_to pins_url
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_pin
-      @pin = Pin.find(params[:id])
+      @pin = Pin.find_by(id: params[:id])
     end
 
     def correct_user
-      @pin = current_user.pins.find_by(id: params[:id])
+      @pin = Pin.find_by(id: params[:id])
+      @pin.user_id = current_user.id
       redirect_to pins_path, notice: "Not authorized to edit this pin" if @pin.nil?
     end
 
